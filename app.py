@@ -48,14 +48,16 @@ if cohere_api_key and openai_api_key:
     vectorstore.embedding =CohereEmbeddings(model="embed-multilingual-v2.0", cohere_api_key=cohere_api_key)
     llm =OpenAI(temperature=0, openai_api_key=openai_api_key)
     qa = RetrievalQA.from_chain_type(llm, retriever=vectorstore.as_retriever())
-    
-    language = st.text_input("What language should I respond in?", placeholder="English, French, Korean?")
 
-    if language:
-        
-        query = st.text_input("Ask your questions below: ", key="input",
-                                        placeholder="10 million open source vectors here, what would you like to know...")
-        if query:
+    if language := st.text_input(
+        "What language should I respond in?",
+        placeholder="English, French, Korean?",
+    ):
+        if query := st.text_input(
+            "Ask your questions below: ",
+            key="input",
+            placeholder="10 million open source vectors here, what would you like to know...",
+        ):
             retriever = vectorstore.as_retriever(search_kwargs={"k": 5})
             compressor = CohereRerank(model='rerank-multilingual-v2.0', top_n=4)
             compression_retriever = ContextualCompressionRetriever(base_compressor=compressor, base_retriever=retriever)
@@ -77,4 +79,4 @@ if cohere_api_key and openai_api_key:
     else:
         st.error("Please tell me what language to respond in.")
 else:
-        st.error("Please paste your API keys in the sidebar.")
+    st.error("Please paste your API keys in the sidebar.")
